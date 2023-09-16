@@ -63,14 +63,11 @@ class KTPOCR(object):
                     self.result.tempat_lahir = word[-1].replace(self.result.tanggal_lahir, '')
                 continue
 
-
             if 'Darah' in word:
-                self.result.jenis_kelamin = re.search("(LAKI-LAKI|LAKI|LELAKI|PEREMPUAN)", word)[0]
-                word = word.split(':')
-                try:
-                    self.result.golongan_darah = re.search("(O|A|B|AB)", word[-1])[0]
-                except:
-                    self.result.golongan_darah = '-'
+                blood_match = re.search("(LAKI-LAKI|LAKI|LELAKI|PEREMPUAN)", word)
+                if blood_match:
+                    self.result.jenis_kelamin = blood_match.group(0)
+
             if 'Alamat' in word:
                 self.result.alamat = self.word_to_number_converter(word).replace("Alamat ","")
             if 'NO.' in word:
@@ -88,7 +85,10 @@ class KTPOCR(object):
                         desa.append(wr)
                 self.result.kelurahan_atau_desa = ''.join(wr)
             if 'Kewarganegaraan' in word:
-                self.result.kewarganegaraan = word.split(':')[1].strip()
+                word_split = word.split(':')
+                if len(word_split) > 1:
+                    self.result.kewarganegaraan = word_split[1].strip()
+
             if 'Pekerjaan' in word:
                 wrod = word.split()
                 pekerjaan = []
@@ -99,7 +99,10 @@ class KTPOCR(object):
             if 'Agama' in word:
                 self.result.agama = word.replace('Agama',"").strip()
             if 'Perkawinan' in word:
-                self.result.status_perkawinan = word.split(':')[1]
+                word_split = word.split(':')
+                if len(word_split) > 1:
+                    self.result.status_perkawinan = word_split[1].strip()
+
             if "RTRW" in word:
                 word = word.replace("RTRW",'')
                 self.result.rt = word.split('/')[0].strip()

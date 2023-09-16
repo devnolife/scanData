@@ -40,10 +40,12 @@ def extract_nik():
 
         # Gunakan KTPOCR untuk ekstraksi NIK
         ocr = KTPOCR(filename)
+        extracted_nik = ocr.result.nik if ocr.result.nik else "NIK tidak ditemukan"
+
         response_data = {
             'message': 'Ekstraksi NIK berhasil!',
             'filename': unique_filename,
-            'nik': ocr
+            'nik': extracted_nik
         }
         return jsonify(response_data), 200
     else:
