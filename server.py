@@ -55,7 +55,8 @@ def upload_file():
 
         results = pytesseract.image_to_string(image, lang="ind")
         cleaned_results = clean_ocr_text(results)
-    # Menghilangkan spasi
+        
+        # Menghilangkan spasi
         cleaned_results = cleaned_results.replace(" ", "")
 
         # Mencari NIK dengan regex
@@ -64,30 +65,23 @@ def upload_file():
             nik = nik_match.group(1)
             # Validasi NIK
             if len(nik) == 16:
-                    response_data = {
-                        'message': 'File berhasil diupload!',
-                        'filename': unique_filename,
-                        'text': cleaned_results,
-                        'nik': nik
-                    }
-                    return jsonify(response_data), 200
+                response_data = {
+                    'message': 'File berhasil diupload!',
+                    'filename': unique_filename,
+                    'text': cleaned_results,
+                    'nik': nik
+                }
+                return jsonify(response_data), 200
 
-            # Jika "NIK" tidak ditemukan atau NIK tidak sesuai, beri pesan kesalahan
-            response_data = {
-                'message': 'NIK tidak sesuai atau tidak terdeteksi. Mohon unggah foto ulang dengan NIK yang jelas.',
-                'filename': unique_filename,
-                'text': cleaned_results
-            }
-            return jsonify(response_data), 400     
+        # Jika "NIK" tidak ditemukan atau NIK tidak sesuai, beri pesan kesalahan
+        response_data = {
+            'message': 'NIK tidak sesuai atau tidak terdeteksi. Mohon unggah foto ulang dengan NIK yang jelas.',
+            'filename': unique_filename,
+            'text': cleaned_results
+        }
+        return jsonify(response_data), 400
     else:
         return jsonify({'message': 'File yang diupload tidak valid!'}), 400
-
-
-@app.route('/images/<filename>')
-def get_image(filename):
-    return send_from_directory('static/images', filename)
-
-
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
