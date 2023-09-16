@@ -55,8 +55,6 @@ def upload_file():
 
         results = pytesseract.image_to_string(image, lang="ind")
         cleaned_results = clean_ocr_text(results)
-        
-        # Menghilangkan spasi
         cleaned_results = cleaned_results.replace(" ", "")
 
         # Mencari NIK dengan regex
@@ -85,3 +83,35 @@ def upload_file():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
+
+
+import cv2
+import pytesseract
+import sys
+from ktpocr import KTPOCR
+
+def read(ktp_path):
+    img = cv2.imread(ktp_path)
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    th, threshed = cv2.threshold(gray, 127, 255, cv2.THRESH_TRUNC)
+    result = pytesseract.image_to_string((threshed), lang="ind")
+    final = []
+    for word in result.split("\n"):
+        if "”—" in word:
+            word = word.replace("”—", ":")
+        if "NIK" in word:
+            nik_char = word.split()
+        if "?" in word:
+            word = word.replace("?", "7") 
+        final.append(word)
+    return final
+
+if __name__ == "__main__":  
+    try:  
+        ktppath = sys.argv[1]    
+    except:
+        ktppath = 'vianda.jpg'  #default image
+    if ktppath:
+        ocr = KTPOCR(ktppath)
+        word = ocr.to_json()
+        print(word)
